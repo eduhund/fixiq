@@ -1,6 +1,6 @@
-const { changeScale } = (() => {
+const changeScale = (() => {
   const scales = [0.5, 1, 2];
-  let currentScale = 1;
+  let currentScale = 0.5;
 
   function changeScale() {
     const currentIndex = scales.findIndex((item) => item === currentScale);
@@ -9,7 +9,7 @@ const { changeScale } = (() => {
     return currentScale;
   }
 
-  return { changeScale };
+  return changeScale;
 })();
 
 const { showNotify, closeNotify } = (() => {
