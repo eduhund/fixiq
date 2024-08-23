@@ -1,6 +1,10 @@
-const changeScale = (() => {
+const { getScale, changeScale } = (() => {
   const scales = [0.5, 1, 2];
-  let currentScale = 0.5;
+  let currentScale = 1;
+
+  function getScale() {
+    return currentScale;
+  }
 
   function changeScale() {
     const currentIndex = scales.findIndex((item) => item === currentScale);
@@ -9,34 +13,38 @@ const changeScale = (() => {
     return currentScale;
   }
 
-  return changeScale;
+  return { getScale, changeScale };
 })();
 
 const { showNotify, closeNotify } = (() => {
   let notify: NotificationHandler | null = null;
 
-  function showNotify(text: string, settings: NotificationOptions) {
-    if (notify) notify.cancel();
-    notify = figma.notify(text, settings);
+  function closeNotify() {
+    if (notify) {
+      notify.cancel();
+      notify = null;
+    }
   }
 
-  function closeNotify() {
-    if (notify) notify.cancel();
+  function showNotify(text: string, settings: NotificationOptions) {
+    closeNotify();
+    notify = figma.notify(text, settings);
   }
 
   return { showNotify, closeNotify };
 })();
 
 function updateScale() {
-  const currentScale = changeScale();
+  const currentScale = getScale();
   const interval = initInterval(currentScale);
   showNotify("Scale is locked", {
     timeout: Infinity,
     button: {
       text: `${currentScale}x`,
       action: () => {
-        clearInterval(interval);
+        changeScale();
         updateScale();
+        clearInterval(interval);
       },
     },
     onDequeue: (reason) => {
@@ -77,7 +85,7 @@ async function run() {
     timeout: Infinity,
   });
 
-  const data = await new Promise((res) => setTimeout(() => res(1), 5000));
+  const data = await new Promise((res) => setTimeout(() => res(1), 1000));
   //checkSubscription("");
 
   if (true) {
