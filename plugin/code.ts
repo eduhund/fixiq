@@ -110,6 +110,7 @@ async function run() {
   //checkSubscription("");
 
   if (true) {
+    initLocker();
     updateScale();
   } else {
     initLocker();
