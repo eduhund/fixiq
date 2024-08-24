@@ -43,13 +43,16 @@ function updateScale() {
       text: `${currentScale}x`,
       action: () => {
         changeScale();
-        updateScale();
         clearInterval(interval);
+        setTimeout(() => {
+          updateScale();
+        }, 10);
       },
     },
     onDequeue: (reason) => {
       if (reason !== "action_button_click") {
         clearInterval(interval);
+        closeNotify();
         figma.closePlugin();
       }
     },
@@ -103,6 +106,7 @@ async function run() {
       onDequeue: (reason) => {
         if (reason !== "action_button_click") {
           clearInterval(interval);
+          closeNotify();
           figma.closePlugin();
         }
       },
