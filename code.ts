@@ -34,16 +34,40 @@ const { showNotify, closeNotify } = (() => {
   return { showNotify, closeNotify };
 })();
 
+const { initLocker, changeLocker, clearLocker } = (() => {
+  let interval: number | null = null;
+
+  function initLocker() {
+    interval = setInterval(() => {
+      figma.viewport.zoom = getScale();
+    }, 14);
+  }
+
+  function changeLocker() {
+    if (interval) clearInterval(interval);
+    const scale = changeScale();
+    setTimeout(() => {
+      interval = setInterval(() => {
+        figma.viewport.zoom = scale;
+      }, 14);
+    }, 10);
+  }
+
+  function clearLocker() {
+    if (interval) clearInterval(interval);
+  }
+
+  return { initLocker, changeLocker, clearLocker };
+})();
+
 function updateScale() {
   const currentScale = getScale();
-  const interval = initInterval(currentScale);
   showNotify("Scale is locked", {
     timeout: Infinity,
     button: {
       text: `${currentScale}x`,
       action: () => {
-        changeScale();
-        clearInterval(interval);
+        changeLocker();
         setTimeout(() => {
           updateScale();
         }, 10);
@@ -51,7 +75,7 @@ function updateScale() {
     },
     onDequeue: (reason) => {
       if (reason !== "action_button_click") {
-        clearInterval(interval);
+        clearLocker();
         closeNotify();
         figma.closePlugin();
       }
@@ -77,12 +101,6 @@ async function checkSubscription(email: string) {
   }
 }
 
-function initInterval(zoom: number) {
-  return setInterval(() => {
-    figma.viewport.zoom = zoom;
-  }, 14);
-}
-
 async function run() {
   showNotify("Cheking your subscription...", {
     timeout: Infinity,
@@ -94,7 +112,7 @@ async function run() {
   if (true) {
     updateScale();
   } else {
-    const interval = initInterval(1);
+    initLocker();
     showNotify("Scale is locked (free trial)", {
       timeout: 300 * 1000,
       button: {
@@ -105,7 +123,7 @@ async function run() {
       },
       onDequeue: (reason) => {
         if (reason !== "action_button_click") {
-          clearInterval(interval);
+          clearLocker();
           closeNotify();
           figma.closePlugin();
         }
