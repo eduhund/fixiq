@@ -1,0 +1,10 @@
+<form onsubmit="checkSubscription(event)">
+  <input type="email" />
+  <button type="submit">Check subscription</button>
+</form>
+<script>
+  function checkSubscription(event) {
+    event.preventDefault();
+    console.log(event);
+  }
+</script>

@@ -84,16 +84,20 @@ function updateScale() {
 }
 
 async function checkSubscription(email: string) {
+  const userId = figma.currentUser?.id || "";
   try {
-    const response = await fetch("https://yourdomain.com/check-access", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
+    const response = await fetch(
+      `https://mcrprdcts.eduhund.com/api/fixiq/check_subscription?email=${email}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const data = await response.json();
+    console.log(data);
     return data.access;
   } catch (error) {
     console.error("Subscribtion check error:", error);
@@ -106,10 +110,9 @@ async function run() {
     timeout: Infinity,
   });
 
-  const data = await new Promise((res) => setTimeout(() => res(1), 1000));
-  //checkSubscription("");
+  const data = await checkSubscription("222@mail.com");
 
-  if (true) {
+  if (false) {
     initLocker();
     updateScale();
   } else {
@@ -119,7 +122,7 @@ async function run() {
       button: {
         text: "Get full version",
         action: () => {
-          figma.showUI("<div>Привет</div");
+          figma.showUI(__html__);
         },
       },
       onDequeue: (reason) => {

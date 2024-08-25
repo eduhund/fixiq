@@ -3,12 +3,13 @@
   "id": "1408159959797666812",
   "api": "1.0.0",
   "main": "code.js",
+  "ui": "ui.html",
   "capabilities": [],
   "enableProposedApi": false,
   "documentAccess": "dynamic-page",
   "editorType": ["figma"],
   "networkAccess": {
-    "allowedDomains": ["none"]
+    "allowedDomains": ["https://mcrprdcts.eduhund.com"]
   },
-  "permissions": ["payments"]
+  "permissions": ["payments", "currentuser"]
 }
