@@ -28,7 +28,7 @@ const { showNotify, closeNotify } = (() => {
 
   function showNotify(text: string, settings: NotificationOptions) {
     closeNotify();
-    notify = figma.notify(text, settings);
+    setTimeout(() => (notify = figma.notify(text, settings)), 10);
   }
 
   return { showNotify, closeNotify };
@@ -68,9 +68,7 @@ function updateScale() {
       text: `${currentScale}x`,
       action: () => {
         changeLocker();
-        setTimeout(() => {
-          updateScale();
-        }, 10);
+        updateScale();
       },
     },
     onDequeue: (reason) => {
@@ -98,11 +96,25 @@ async function checkSubscription(email?: string) {
       },
     });
 
+    if (response.status !== 200) {
+      showNotify(
+        "We have some problem. Please, run plugin again, or mail us: figma@eduhund.com",
+        {
+          error: true,
+          timeout: 10 * 1000,
+          onDequeue: () => {
+            figma.closePlugin();
+          },
+        }
+      );
+      return null;
+    }
+
     const data = await response.json();
     return data?.access;
-  } catch (error) {
-    console.error("Subscribtion check error:", error);
-    return false;
+  } catch {
+    console.error("Subscribtion check error:");
+    figma.closePlugin();
   }
 }
 
@@ -113,23 +125,48 @@ async function run() {
 
   const result = await checkSubscription();
 
+  if (result === null) {
+    return;
+  }
+
   if (result) {
     initLocker();
     updateScale();
   } else {
     initLocker();
-    showNotify("Scale is locked (free trial)", {
-      timeout: 300 * 1000,
-      button: {
-        text: "Get full version",
-        action: () => {
-          figma.showUI(__html__);
+
+    const timeFromFirstRun = figma?.payments?.getUserFirstRanSecondsAgo() || 0;
+
+    if (timeFromFirstRun > 3 * 24 * 60 * 60) {
+      clearLocker();
+      showNotify("You have reached 3 days free trial", {
+        timeout: Infinity,
+        button: {
+          text: "Get full version",
+          action: () => {
+            figma.showUI(__html__);
+          },
         },
-      },
-      onDequeue: (reason) => {
-        if (reason !== "action_button_click") {
-          setTimeout(() => {
-            showNotify("You reached out 5 minutes lock limit.", {
+        onDequeue: (reason) => {
+          if (reason !== "action_button_click") {
+            clearLocker();
+            closeNotify();
+            figma.closePlugin();
+          }
+        },
+      });
+    } else {
+      showNotify("Scale is locked (free trial)", {
+        timeout: 300 * 1000,
+        button: {
+          text: "Get full version",
+          action: () => {
+            figma.showUI(__html__);
+          },
+        },
+        onDequeue: (reason) => {
+          if (reason !== "action_button_click") {
+            showNotify("You have reached 5 minutes lock limit", {
               timeout: Infinity,
               button: {
                 text: "Get full version",
@@ -145,11 +182,11 @@ async function run() {
                 }
               },
             });
-          }, 10);
-          clearLocker();
-        }
-      },
-    });
+            clearLocker();
+          }
+        },
+      });
+    }
   }
 }
 
