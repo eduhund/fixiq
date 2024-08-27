@@ -5,6 +5,15 @@
 <script>
   function checkSubscription(event) {
     event.preventDefault();
-    console.log(event);
+    const email = event.target[0]?.value;
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "checkEmail",
+          email,
+        },
+      },
+      "*"
+    );
   }
 </script>

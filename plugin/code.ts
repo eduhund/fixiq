@@ -83,22 +83,23 @@ function updateScale() {
   });
 }
 
-async function checkSubscription(email: string) {
+async function checkSubscription(email?: string) {
   const userId = figma.currentUser?.id || "";
+  let uri = `https://mcrprdcts.eduhund.com/api/fixiq/check_subscription?user_id=${userId}`;
+
+  if (email) {
+    uri += `&email=${email}`;
+  }
   try {
-    const response = await fetch(
-      `https://mcrprdcts.eduhund.com/api/fixiq/check_subscription?email=${email}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(uri, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     const data = await response.json();
-    console.log(data);
-    return data.access;
+    return data?.access;
   } catch (error) {
     console.error("Subscribtion check error:", error);
     return false;
@@ -110,9 +111,9 @@ async function run() {
     timeout: Infinity,
   });
 
-  const data = await checkSubscription("222@mail.com");
+  const result = await checkSubscription();
 
-  if (false) {
+  if (result) {
     initLocker();
     updateScale();
   } else {
@@ -127,9 +128,25 @@ async function run() {
       },
       onDequeue: (reason) => {
         if (reason !== "action_button_click") {
+          setTimeout(() => {
+            showNotify("You reached out 5 minutes lock limit.", {
+              timeout: Infinity,
+              button: {
+                text: "Get full version",
+                action: () => {
+                  figma.showUI(__html__);
+                },
+              },
+              onDequeue: (reason) => {
+                if (reason !== "action_button_click") {
+                  clearLocker();
+                  closeNotify();
+                  figma.closePlugin();
+                }
+              },
+            });
+          }, 10);
           clearLocker();
-          closeNotify();
-          figma.closePlugin();
         }
       },
     });
@@ -137,3 +154,18 @@ async function run() {
 }
 
 run();
+
+figma.ui.onmessage = async (message) => {
+  const { type } = message;
+
+  switch (type) {
+    case "checkEmail":
+      const { email } = message;
+      const result = await checkSubscription(email);
+
+      if (result) {
+        updateScale();
+        figma.ui.hide();
+      }
+  }
+};
