@@ -166,7 +166,7 @@ async function run() {
           },
         },
         onDequeue: (reason) => {
-          if (reason !== "action_button_click") {
+          if (reason === "timeout") {
             showNotify("You have reached 5 minutes lock limit", {
               timeout: Infinity,
               button: {
@@ -179,11 +179,16 @@ async function run() {
                 if (reason !== "action_button_click") {
                   clearLocker();
                   closeNotify();
-                  figma.ui.show();
+                  figma.closePlugin();
                 }
               },
             });
             clearLocker();
+          }
+          if (reason === "dismiss") {
+            clearLocker();
+            closeNotify();
+            figma.closePlugin();
           }
         },
       });
@@ -197,7 +202,7 @@ figma.ui.onmessage = async (message) => {
   const { type } = message;
 
   switch (type) {
-    case "checkEmail":
+    case "checkEmail": {
       const { email } = message;
       const result = await checkSubscription(email);
 
@@ -207,5 +212,6 @@ figma.ui.onmessage = async (message) => {
       } else {
         figma.ui.postMessage({ type: "invalidEmail" });
       }
+    }
   }
 };
