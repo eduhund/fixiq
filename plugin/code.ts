@@ -62,7 +62,7 @@ const { initLocker, changeLocker, clearLocker } = (() => {
 
 function updateScale() {
   const currentScale = getScale();
-  showNotify("Scale is locked", {
+  showNotify("Zoom is locked", {
     timeout: Infinity,
     button: {
       text: `${currentScale}x`,
@@ -98,7 +98,7 @@ async function checkSubscription(email?: string) {
 
     if (response.status !== 200) {
       showNotify(
-        "We have some problem. Please, run plugin again, or mail us: figma@eduhund.com",
+        "We have some problem. Please, run plugin again, or mail us: we@eduhund.com",
         {
           error: true,
           timeout: 10 * 1000,
@@ -156,7 +156,7 @@ async function run() {
         },
       });
     } else {
-      showNotify("Scale is locked (free trial)", {
+      showNotify("Zoom is locked (free trial)", {
         timeout: 300 * 1000,
         button: {
           text: "Get full version",
