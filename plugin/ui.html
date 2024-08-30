@@ -77,6 +77,14 @@
   .subscription_form input {
     flex-grow: 1;
   }
+
+  .email_error {
+    color: #ff6347;
+  }
+
+  ._hidden {
+    display: none;
+  }
 </style>
 <div class="block features">
   <h2>What will you get?</h2>
@@ -102,6 +110,9 @@
       <input type="email" placeholder="type@email.here" />
       <button type="submit">Check</button>
     </form>
+    <span id="email_error" class="email_error _hidden"
+      >We can't find this email</span
+    >
   </ol>
   <p>When succeed, this modal will close and you can start using the plugin.</p>
   <p>
@@ -119,6 +130,7 @@
 <script>
   function checkSubscription(event) {
     event.preventDefault();
+    document.querySelector("#email_error")?.classList?.add("_hidden");
     const email = event.target[0]?.value;
     parent.postMessage(
       {
@@ -130,4 +142,13 @@
       "*"
     );
   }
+
+  onmessage = (event) => {
+    const { type } = event.data.pluginMessage;
+
+    switch (type) {
+      case "invalidEmail":
+        document.querySelector("#email_error")?.classList?.remove("_hidden");
+    }
+  };
 </script>

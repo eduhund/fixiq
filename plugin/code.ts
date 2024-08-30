@@ -119,6 +119,7 @@ async function checkSubscription(email?: string) {
 }
 
 async function run() {
+  figma.showUI(__html__, { visible: false, width: 280, height: 480 });
   showNotify("Cheking your subscription...", {
     timeout: Infinity,
   });
@@ -144,7 +145,7 @@ async function run() {
         button: {
           text: "Get full version",
           action: () => {
-            figma.showUI(__html__);
+            figma.ui.show();
           },
         },
         onDequeue: (reason) => {
@@ -161,7 +162,7 @@ async function run() {
         button: {
           text: "Get full version",
           action: () => {
-            figma.showUI(__html__);
+            figma.ui.show();
           },
         },
         onDequeue: (reason) => {
@@ -171,14 +172,14 @@ async function run() {
               button: {
                 text: "Get full version",
                 action: () => {
-                  figma.showUI(__html__);
+                  figma.ui.show();
                 },
               },
               onDequeue: (reason) => {
                 if (reason !== "action_button_click") {
                   clearLocker();
                   closeNotify();
-                  figma.closePlugin();
+                  figma.ui.show();
                 }
               },
             });
@@ -203,6 +204,8 @@ figma.ui.onmessage = async (message) => {
       if (result) {
         updateScale();
         figma.ui.hide();
+      } else {
+        figma.ui.postMessage({ type: "invalidEmail" });
       }
   }
 };
