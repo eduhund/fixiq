@@ -83,7 +83,7 @@ function updateScale() {
 
 async function checkSubscription(email?: string) {
   const userId = figma.currentUser?.id || "";
-  let uri = `https://mcrprdcts.eduhund.com/api/fixiq/check_subscription?user_id=${userId}`;
+  let uri = `https://mcrprdcts.eduhund.com/api/check_subscription?product_id=FXQ&user_id=${userId}`;
 
   if (email) {
     uri += `&email=${email}`;
