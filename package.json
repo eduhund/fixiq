@@ -1,6 +1,6 @@
 {
   "name": "fixiq",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Figma plugin that fixes the scale of the working area",
   "main": "code.js",
   "scripts": {
@@ -9,7 +9,11 @@
     "lint:fix": "eslint --ext .ts,.tsx --ignore-pattern node_modules --fix .",
     "watch": "npm run build -- --watch"
   },
-  "author": "Roman Nebel",
+  "author": {
+    "name": "Roman Nebel",
+    "email": "nebel@eduhund.com",
+    "url": "https://eduhund.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "@figma/eslint-plugin-figma-plugins": "*",
